@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Interaction Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+
+        .video-container {
+            position: relative;
+            width: 80%;
+            max-width: 800px;
+        }
+
+        video {
+            width: 100%;
+            border-radius: 8px;
+        }
+
+        .subtitle-box {
+            position: absolute;
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 10px;
+            border-radius: 4px;
+            max-width: 80%;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .query-box {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .score-container {
+            margin-top: 20px;
+            display: none;
+            text-align: center;
+        }
+
+        .score-container button {
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .score-container button:hover {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="video-container">
+        <video id="video" controls>
+            <source src="video.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div class="subtitle-box" id="subtitle"></div>
+        <div class="query-box" id="query"></div>
+    </div>
+
+    <div class="score-container" id="score-container">
+        <p>Please rate your experience (1-5):</p>
+        <div id="score-buttons"></div>
+    </div>
+
+    <script>
+        const subtitles = [
+            { timestamp: 2, text: "LMM Response: Hello, how can I help?" },
+            { timestamp: 5, text: "LMM Response: Sure, here are the steps." },
+            { timestamp: 8, text: "LMM Response: Let me guide you further." }
+        ];
+
+        const queries = [
+            { timestamp: 0, text: "Query: How do I cook this dish?" }
+        ];
+
+        const video = document.getElementById("video");
+        const subtitleBox = document.getElementById("subtitle");
+        const queryBox = document.getElementById("query");
+        const scoreContainer = document.getElementById("score-container");
+        const scoreButtons = document.getElementById("score-buttons");
+
+        subtitles.forEach((subtitle, index) => {
+            setTimeout(() => {
+                subtitleBox.innerText = subtitle.text;
+                setTimeout(() => {
+                    subtitleBox.innerText = "";
+                }, 3000); // Clear after 3 seconds
+            }, subtitle.timestamp * 1000);
+        });
+
+        queries.forEach((query, index) => {
+            setTimeout(() => {
+                queryBox.innerText = query.text;
+                setTimeout(() => {
+                    queryBox.innerText = "";
+                }, 5000); // Clear after 5 seconds
+            }, query.timestamp * 1000);
+        });
+
+        video.addEventListener("ended", () => {
+            scoreContainer.style.display = "block";
+            for (let i = 1; i <= 5; i++) {
+                const button = document.createElement("button");
+                button.innerText = i;
+                button.onclick = () => alert(`You rated: ${i}`);
+                scoreButtons.appendChild(button);
+            }
+        });
+    </script>
+</body>
+</html>
