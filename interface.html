@@ -20,6 +20,7 @@
             position: relative;
             width: 80%;
             max-width: 800px;
+            margin-top: 20px;
         }
 
         video {
@@ -52,6 +53,24 @@
             font-size: 14px;
         }
 
+        .button-container {
+            margin-top: 20px;
+        }
+
+        .button-container button {
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .button-container button:hover {
+            background-color: #007bff;
+            color: #fff;
+        }
+
         .score-container {
             margin-top: 20px;
             display: none;
@@ -71,13 +90,21 @@
             background-color: #007bff;
             color: #fff;
         }
-
     </style>
 </head>
 <body>
-    <div class="video-container">
+    <div class="button-container" id="button-container">
+        <p>Select a video to test:</p>
+        <button onclick="loadVideo('video1.mp4')">Video 1</button>
+        <button onclick="loadVideo('video2.mp4')">Video 2</button>
+        <button onclick="loadVideo('video3.mp4')">Video 3</button>
+        <button onclick="loadVideo('video4.mp4')">Video 4</button>
+        <button onclick="loadVideo('video5.mp4')">Video 5</button>
+    </div>
+
+    <div class="video-container" style="display: none;" id="video-container">
         <video id="video" controls>
-            <source src="video.mp4" type="video/mp4">
+            <source id="video-source" src="" type="video/mp4">
             Your browser does not support the video tag.
         </video>
         <div class="subtitle-box" id="subtitle"></div>
@@ -90,49 +117,69 @@
     </div>
 
     <script>
-        const subtitles = [
-            { timestamp: 2, text: "LMM Response: Hello, how can I help?" },
-            { timestamp: 5, text: "LMM Response: Sure, here are the steps." },
-            { timestamp: 8, text: "LMM Response: Let me guide you further." }
-        ];
-
-        const queries = [
-            { timestamp: 0, text: "Query: How do I cook this dish?" }
-        ];
-
+        const videoContainer = document.getElementById("video-container");
         const video = document.getElementById("video");
+        const videoSource = document.getElementById("video-source");
         const subtitleBox = document.getElementById("subtitle");
         const queryBox = document.getElementById("query");
         const scoreContainer = document.getElementById("score-container");
         const scoreButtons = document.getElementById("score-buttons");
 
-        subtitles.forEach((subtitle, index) => {
-            setTimeout(() => {
-                subtitleBox.innerText = subtitle.text;
-                setTimeout(() => {
-                    subtitleBox.innerText = "";
-                }, 3000); // Clear after 3 seconds
-            }, subtitle.timestamp * 1000);
-        });
+        const subtitles = {
+            "video1.mp4": [
+                { timestamp: 2, text: "LMM Response: Hello, how can I help?" },
+                { timestamp: 5, text: "LMM Response: Sure, here are the steps." }
+            ],
+            "video2.mp4": [
+                { timestamp: 3, text: "LMM Response: Let's get started!" },
+                { timestamp: 6, text: "LMM Response: Here's the next step." }
+            ]
+        };
 
-        queries.forEach((query, index) => {
-            setTimeout(() => {
-                queryBox.innerText = query.text;
-                setTimeout(() => {
-                    queryBox.innerText = "";
-                }, 5000); // Clear after 5 seconds
-            }, query.timestamp * 1000);
-        });
+        const queries = {
+            "video1.mp4": [
+                { timestamp: 0, text: "Query: How do I cook this dish?" }
+            ],
+            "video2.mp4": [
+                { timestamp: 1, text: "Query: What's the first step in assembling?" }
+            ]
+        };
 
-        video.addEventListener("ended", () => {
-            scoreContainer.style.display = "block";
+        function loadVideo(videoFile) {
+            videoSource.src = videoFile;
+            video.load();
+            videoContainer.style.display = "block";
+            document.getElementById("button-container").style.display = "none";
+
+            const videoSubtitles = subtitles[videoFile] || [];
+            const videoQueries = queries[videoFile] || [];
+
+            video.ontimeupdate = () => {
+                const currentTime = video.currentTime;
+                updateDisplay(videoSubtitles, subtitleBox, currentTime);
+                updateDisplay(videoQueries, queryBox, currentTime);
+            };
+
+            video.onended = () => {
+                scoreContainer.style.display = "block";
+                createScoreButtons();
+            };
+        }
+
+        function updateDisplay(items, element, currentTime) {
+            const item = items.find(({ timestamp }) => Math.abs(currentTime - timestamp) < 1);
+            element.innerText = item ? item.text : "";
+        }
+
+        function createScoreButtons() {
+            scoreButtons.innerHTML = "";
             for (let i = 1; i <= 5; i++) {
                 const button = document.createElement("button");
                 button.innerText = i;
                 button.onclick = () => alert(`You rated: ${i}`);
                 scoreButtons.appendChild(button);
             }
-        });
+        }
     </script>
 </body>
 </html>
